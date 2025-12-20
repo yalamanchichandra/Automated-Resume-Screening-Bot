@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Resume Screening Bot Demo</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="container">
+<h1>Resume Screening Bot Demo</h1>
+<form action="/analyze" method="post" enctype="multipart/form-data">
+<label>Role Name:</label>
+<input type="text" name="role_name" required><br><br>
+<label>Job Description (text):</label>
+<textarea name="jd_text" rows="6" placeholder="Paste JD here..."></textarea><br><br>
+<label>Upload JD File (optional):</label>
+<input type="file" name="jd_file"><br><br>
+<label>Upload Resumes (max 10):</label>
+<input type="file" name="resumes" multiple required><br><br>
+<button type="submit">Analyze</button>
+</form>
+</div>
+</body>
+</html>

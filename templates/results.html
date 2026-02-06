@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Results — Resume Screening Bot</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   RESET
+   ============================================================ */
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+}
+
+/* ============================================================
+   VARS  (identical to index.html)
+   ============================================================ */
+:root {
+  --bg:          #020408;
+  --surface:     #0a0e18;
+  --surface2:    #0f1420;
+  --border:      #1a2235;
+  --cyan:        #00e5ff;
+  --cyan-dim:    rgba(0,229,255,.08);
+  --cyan-mid:    rgba(0,229,255,.18);
+  --cyan-glow:   rgba(0,229,255,.35);
+  --magenta:     #ff2d9b;
+  --mag-dim:     rgba(255,45,155,.1);
+  --mag-glow:    rgba(255,45,155,.3);
+  --white:       #e2e8f0;
+  --white-dim:   #94a3b8;
+  --red:         #ff3b3b;
+  --red-dim:     rgba(255,59,59,.12);
+  --green:       #00e676;
+  --green-dim:   rgba(0,230,118,.1);
+  --green-glow:  rgba(0,230,118,.3);
+  --amber:       #ffab40;
+  --amber-dim:   rgba(255,171,64,.1);
+  --amber-glow:  rgba(255,171,64,.3);
+  --radius:      10px;
+  --trans:       .3s cubic-bezier(.4,0,.2,1);
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Rajdhani', sans-serif;
+  background: var(--bg);
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   BACKGROUND LAYERS  (identical to index.html)
+   ============================================================ */
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridMove 20s linear infinite;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 40%, #000 20%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 40%, #000 20%, transparent 75%);
+}
+@keyframes gridMove {
+  0%   { background-position: 0 0; }
+  100% { background-position: 60px 60px; }
+}
+
+.scanlines {
+  position: fixed; inset: 0; z-index: 1;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,.04) 2px, rgba(0,0,0,.04) 4px
+  );
+}
+
+.blob {
+  position: fixed; border-radius: 50%; filter: blur(120px); z-index: 0;
+  pointer-events: none; opacity: .18;
+}
+.blob-1 { width:500px; height:500px; background: var(--cyan); top:-180px; left:-140px; animation: blobFloat 8s ease-in-out infinite alternate; }
+.blob-2 { width:400px; height:400px; background: var(--magenta); bottom:-100px; right:-120px; animation: blobFloat 10s ease-in-out infinite alternate-reverse; }
+.blob-3 { width:260px; height:260px; background: var(--cyan); top:50%; left:60%; animation: blobFloat 12s ease-in-out infinite alternate; }
+@keyframes blobFloat {
+  0%   { transform: translate(0,0) scale(1); }
+  100% { transform: translate(30px,-40px) scale(1.08); }
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.page {
+  position: relative; z-index: 2;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 70px 24px 120px;
+}
+
+/* ============================================================
+   HEADER  (same structure as index.html)
+   ============================================================ */
+.header {
+  text-align: center;
+  margin-bottom: 56px;
+  position: relative;
+}
+.header::before, .header::after {
+  content: '';
+  position: absolute;
+  width: 40px; height: 40px;
+  border-color: var(--cyan); border-style: solid;
+  opacity: .45;
+  animation: cornerPulse 3s ease-in-out infinite alternate;
+}
+.header::before { top: -12px; left: 50%; transform: translateX(-50%) translateX(-220px); border-width: 2px 0 0 2px; }
+.header::after  { top: -12px; left: 50%; transform: translateX(-50%) translateX(220px);  border-width: 2px 2px 0 0; }
+@keyframes cornerPulse { 0% { opacity:.25; } 100% { opacity:.6; } }
+
+.header-line {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  margin-bottom: 28px;
+}
+.header-line .line {
+  width: 60px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan));
+}
+.header-line .line:last-child {
+  background: linear-gradient(270deg, transparent, var(--cyan));
+}
+.header-line .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan-glow), 0 0 20px var(--cyan-dim);
+  animation: dotPulse 2s ease-in-out infinite;
+}
+@keyframes dotPulse {
+  0%,100% { box-shadow: 0 0 6px var(--cyan-glow), 0 0 16px var(--cyan-dim); }
+  50%     { box-shadow: 0 0 14px var(--cyan-glow), 0 0 36px var(--cyan-mid); }
+}
+
+.badge {
+  display: inline-block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .68rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  border: 1px solid rgba(0,229,255,.25);
+  border-radius: 4px;
+  padding: 5px 14px;
+  margin-bottom: 22px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeDown .7s .05s both;
+}
+.badge::before {
+  content:'';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,229,255,.12), transparent);
+  animation: badgeSweep 3s ease-in-out infinite;
+}
+@keyframes badgeSweep {
+  0%   { left: -100%; }
+  100% { left: 200%; }
+}
+
+.header h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: .04em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  animation: fadeDown .7s .12s both;
+  position: relative; display: inline-block;
+}
+.header h1 .line1 { display: block; color: var(--white); }
+.header h1 .line2 {
+  display: block;
+  background: linear-gradient(90deg, var(--cyan), var(--magenta), var(--cyan));
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s ease infinite;
+  filter: drop-shadow(0 0 18px rgba(0,229,255,.3));
+}
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.header p {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .74rem;
+  color: var(--white-dim);
+  margin-top: 18px;
+  letter-spacing: .12em;
+  animation: fadeDown .7s .2s both;
+}
+
+/* ============================================================
+   JD SUMMARY BOX
+   ============================================================ */
+.jd-box {
+  position: relative;
+  border-radius: var(--radius);
+  margin-bottom: 44px;
+  animation: fadeDown .55s .24s both; opacity: 0;
+}
+/* gradient border — same mask trick as textarea in index.html */
+.jd-box::before {
+  content:'';
+  position: absolute; inset: 0;
+  border-radius: var(--radius);
+  padding: 1.5px;
+  background: linear-gradient(135deg, var(--cyan), var(--border) 40%, var(--border) 60%, var(--magenta));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: .45;
+}
+.jd-inner {
+  position: relative; z-index: 1;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+}
+.jd-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .62rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  border-left: 2px solid var(--cyan);
+  padding-left: 10px;
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.jd-label .jd-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 4px var(--cyan-glow);
+}
+.jd-text {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .72rem;
+  color: #94a3b8;
+  line-height: 1.7;
+  opacity: 1;
+}
+
+/* ============================================================
+   RESULTS HEADER
+   ============================================================ */
+.results-header {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 28px;
+  animation: fadeDown .55s .32s both; opacity: 0;
+}
+.results-header .rh-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+.results-header .rh-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  white-space: nowrap;
+}
+.results-header .rh-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 6px var(--cyan-glow);
+}
+.results-header .rh-count {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .6rem;
+  color: var(--white-dim);
+  letter-spacing: .1em;
+  opacity: .5;
+}
+
+/* ============================================================
+   RESULT CARDS
+   ============================================================ */
+.result-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px 20px 26px;
+  margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: 38px 68px 1fr auto;
+  align-items: center;
+  gap: 18px;
+  transition: border-color var(--trans), box-shadow var(--trans), transform var(--trans);
+  animation: cardIn .4s var(--trans) both;
+  overflow: hidden;
+}
+/* left glow stripe */
+.result-card::before {
+  content:'';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--cyan), var(--magenta));
+  box-shadow: 2px 0 12px var(--cyan-dim);
+}
+.result-card:hover {
+  border-color: rgba(0,229,255,.25);
+  box-shadow: 0 0 24px var(--cyan-dim);
+  transform: translateX(4px);
+}
+
+/* --- RANK --- */
+.rank {
+  font-family: 'Orbitron', sans-serif;
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--bg);
+  background: var(--cyan);
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 10px var(--cyan-dim);
+  flex-shrink: 0;
+}
+/* top-3 get magenta accent on rank */
+.result-card.top .rank {
+  background: linear-gradient(135deg, var(--cyan), var(--magenta));
+  box-shadow: 0 0 12px var(--mag-dim);
+}
+
+/* --- SCORE RING --- */
+.score-wrap {
+  flex-shrink: 0;
+  width: 68px; height: 68px;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.score-wrap svg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  transform: rotate(-90deg);
+}
+.score-bg  { fill: none; stroke: var(--border);  stroke-width: 4; }
+.score-arc { fill: none; stroke-width: 4; stroke-linecap: round;
+             filter: drop-shadow(0 0 5px currentColor);
+             transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1); }
+/* color bands */
+.score-arc.green  { stroke: var(--green);  color: var(--green-glow); }
+.score-arc.amber  { stroke: var(--amber);  color: var(--amber-glow); }
+.score-arc.red    { stroke: var(--red);    color: rgba(255,59,59,.35); }
+
+.score-val {
+  position: relative; z-index: 1;
+  font-family: 'Orbitron', sans-serif;
+  font-size: .75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.score-val.green { color: var(--green); }
+.score-val.amber { color: var(--amber); }
+.score-val.red   { color: var(--red); }
+
+/* --- MIDDLE COLUMN: name + reason + sim pill --- */
+.card-body { min-width: 0; }
+.card-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: .92rem;
+  font-weight: 600;
+  color: var(--white);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+.card-reason {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .66rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  opacity: 1;
+}
+
+/* --- RIGHT COLUMN: TF-IDF pill --- */
+.sim-wrap { text-align: right; flex-shrink: 0; }
+.sim-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .55rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  opacity: .45;
+  margin-bottom: 4px;
+}
+.sim-pill {
+  display: inline-block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: .62rem;
+  font-weight: 700;
+  color: var(--cyan);
+  background: var(--cyan-dim);
+  border: 1px solid rgba(0,229,255,.18);
+  border-radius: 20px;
+  padding: 4px 10px;
+  letter-spacing: .06em;
+}
+
+/* ============================================================
+   BACK LINK  (matches btn-screen style from index.html)
+   ============================================================ */
+.back-row { text-align: center; margin-top: 48px; }
+.btn-back {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 10px;
+  background: transparent;
+  border: none;
+  color: var(--bg);
+  padding: 13px 36px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  overflow: hidden;
+  border-radius: 6px;
+  z-index: 1;
+  transition: transform var(--trans);
+}
+.btn-back::before {
+  content:'';
+  position: absolute; inset: 0;
+  border-radius: 6px;
+  padding: 1.5px;
+  background: linear-gradient(90deg, var(--cyan), var(--magenta), var(--cyan));
+  background-size: 200% 100%;
+  animation: btnBorderShift 2s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  z-index: -1;
+}
+@keyframes btnBorderShift {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.btn-back::after {
+  content:'';
+  position: absolute; inset: 1.5px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, var(--cyan), #00bcd4);
+  z-index: -1;
+  transition: filter var(--trans);
+}
+.btn-back:hover::after { filter: brightness(1.15) drop-shadow(0 0 16px var(--cyan-glow)); }
+.btn-back:hover { transform: translateY(-2px); }
+.btn-back:active { transform: scale(.97); }
+.btn-back .btn-text { position: relative; z-index: 1; color: var(--bg); }
+.btn-back .btn-arrow { position: relative; z-index: 1; color: var(--bg); font-size: .9rem; transition: transform var(--trans); }
+.btn-back:hover .btn-arrow { transform: translateX(-4px); }
+
+/* ============================================================
+   KEYFRAMES
+   ============================================================ */
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND LAYERS (identical to index.html) -->
+<div class="bg-grid"></div>
+<div class="scanlines"></div>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-line">
+      <span class="line"></span>
+      <span class="dot"></span>
+      <span class="line"></span>
+    </div>
+    <div class="badge">Analysis Complete // Results</div>
+    <h1>
+      <span class="line1">Screening</span>
+      <span class="line2">Results</span>
+    </h1>
+    <p>[ CANDIDATE EVALUATION SYSTEM ]</p>
+  </header>
+
+  <!-- JD SUMMARY -->
+  <div class="jd-box">
+    <div class="jd-inner">
+      <div class="jd-label"><span class="jd-dot"></span> Job Description Summary</div>
+      <p class="jd-text">{{ jd_summary }}</p>
+    </div>
+  </div>
+
+  <!-- RESULTS HEADER -->
+  <div class="results-header">
+    <span class="rh-dot"></span>
+    <span class="rh-title">Ranked Candidates</span>
+    <span class="rh-line"></span>
+    <span class="rh-count">{{ results | length }} TOTAL</span>
+  </div>
+
+  <!-- CARDS -->
+  {% for r in results %}
+  {% set score_val = r.score | int %}
+  {% if score_val >= 70 %}{% set band = "green" %}
+  {% elif score_val >= 40 %}{% set band = "amber" %}
+  {% else %}{% set band = "red" %}{% endif %}
+
+  <!--
+    SVG circle math:
+      radius = 28, circumference = 2 * π * 28 ≈ 175.93
+      dashoffset = circumference - (score / 100) * circumference
+  -->
+  {% set circ = 175.93 %}
+  {% set offset = circ - (score_val / 100.0) * circ %}
+
+  <div class="result-card {% if loop.index <= 3 %}top{% endif %}"
+       style="animation-delay: {{ loop.index0 * 0.08 }}s;">
+
+    <!-- RANK -->
+    <div class="rank">{{ loop.index }}</div>
+
+    <!-- SCORE RING -->
+    <div class="score-wrap">
+      <svg viewBox="0 0 68 68">
+        <circle class="score-bg"  cx="34" cy="34" r="28"/>
+        <circle class="score-arc {{ band }}" cx="34" cy="34" r="28"
+                stroke-dasharray="{{ circ }}"
+                stroke-dashoffset="{{ offset }}"/>
+      </svg>
+      <span class="score-val {{ band }}">{{ score_val }}%</span>
+    </div>
+
+    <!-- BODY -->
+    <div class="card-body">
+      <div class="card-name">{{ r.name }}</div>
+      <div class="card-reason">{{ r.reason }}</div>
+    </div>
+
+    <!-- TF-IDF -->
+    <div class="sim-wrap">
+      <div class="sim-label">TF-IDF</div>
+      {% if r.similarity is not none %}
+        <div class="sim-pill">{{ r.similarity }}%</div>
+      {% else %}
+        <div class="sim-pill" style="opacity:.3;">—</div>
+      {% endif %}
+    </div>
+
+  </div>
+  {% endfor %}
+
+  <!-- BACK -->
+  <div class="back-row">
+    <a href="/" class="btn-back">
+      <span class="btn-arrow">←</span>
+      <span class="btn-text">Back to Screening</span>
+    </a>
+  </div>
+
+</div>
+</body>
+</html>

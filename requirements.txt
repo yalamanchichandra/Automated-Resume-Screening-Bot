@@ -1,0 +1,9 @@
+requests
+pdfplumber
+python-docx
+groq
+fastapi
+uvicorn
+jinja2
+python-multipart
+scikit-learn

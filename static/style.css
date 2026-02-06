@@ -1,0 +1,75 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    background: white;
+    padding: 20px;
+}
+
+h1 {
+    color: #007bff;
+}
+
+textarea {
+    width: 100%;
+}
+
+button {
+    background: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+th {
+    background: #007bff;
+    color: white;
+}
+
+.jd-box {
+    background: #eef4ff;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+/* ===== SCORE COLOR CODING (ADDED) ===== */
+
+.score-green {
+    background-color: #d4edda;
+    color: #155724;
+    font-weight: bold;
+    text-align: center;
+}
+
+.score-amber {
+    background-color: #fff3cd;
+    color: #856404;
+    font-weight: bold;
+    text-align: center;
+}
+
+.score-red {
+    background-color: #f8d7da;
+    color: #721c24;
+    font-weight: bold;
+    text-align: center;
+}
